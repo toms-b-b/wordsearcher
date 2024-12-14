@@ -7,6 +7,7 @@ import { PuzzleGrid } from './PuzzleGrid';
 import { WordList } from './WordList';
 import { ConfigPanel } from './ConfigPanel';
 import { PAGE_SIZES, FONT_OPTIONS, MIN_GRID_SIZE } from '../utils/constants';
+import { calculateMinGridSize } from '../utils/gridSizeCalculator';
 
 export function PuzzleGenerator() {
   const [puzzles, setPuzzles] = useState<PuzzleConfig[]>([]);
@@ -36,15 +37,15 @@ export function PuzzleGenerator() {
         throw new Error('No valid puzzles found in the CSV file');
       }
       
-      // Calculate minimum grid size based on longest word
-      const longestWordLength = Math.max(
-        ...parsedPuzzles.flatMap(p => p.words.map(w => w.length))
-      );
-      const minGridSize = Math.max(MIN_GRID_SIZE, longestWordLength + 1);
+      const { minRequiredSize, newGridSize } = calculateMinGridSize(parsedPuzzles, config.gridSize);
       
+      if (config.gridSize < minRequiredSize) {
+        alert(`Grid size has been automatically increased to ${minRequiredSize} to accommodate the longest word`);
+      }
+
       setConfig(prev => ({
         ...prev,
-        gridSize: Math.max(prev.gridSize, minGridSize)
+        gridSize: newGridSize
       }));
 
       const newPuzzles = parsedPuzzles.map(p => ({
@@ -53,7 +54,7 @@ export function PuzzleGenerator() {
         titleFontSize: config.titleFontSize,
         pageSize: config.pageSize,
         directions: config.directions,
-        gridSize: Math.max(config.gridSize, minGridSize),
+        gridSize: newGridSize,
         font: config.font
       }));
       

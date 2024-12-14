@@ -1,11 +1,12 @@
 import React from 'react';
 import { Upload, Download } from 'lucide-react';
-import { PAGE_SIZES, FONT_OPTIONS, MIN_GRID_SIZE, MAX_GRID_SIZE } from '../utils/constants';
+import { PAGE_SIZES, FONT_OPTIONS } from '../utils/constants';
 import { PuzzleConfig } from '../types';
 
 interface ConfigPanelProps {
-  config: any;
-  setConfig: (config: any) => void;
+  config: PuzzleConfig;
+  minGridSize: number;
+  setConfig: (config: PuzzleConfig) => void;
   regeneratePuzzles: () => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDownload: () => void;
@@ -14,14 +15,18 @@ interface ConfigPanelProps {
 
 export function ConfigPanel({
   config,
+  minGridSize,
   setConfig,
   regeneratePuzzles,
   handleFileUpload,
   handleDownload,
-  puzzles
+  puzzles,
 }: ConfigPanelProps) {
   const handleConfigChange = (key: string, value: any) => {
-    setConfig((prev: any) => ({ ...prev, [key]: value }));
+    if (key === 'gridSize' && value < minGridSize) {
+      value = minGridSize;
+    }
+    setConfig({ ...config, [key]: value });
     regeneratePuzzles();
   };
 
@@ -47,6 +52,7 @@ export function ConfigPanel({
             </label>
             {puzzles.length > 0 && (
               <button
+                type="button"
                 onClick={handleDownload}
                 className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
               >
@@ -65,12 +71,12 @@ export function ConfigPanel({
             <select
               value={config.font.label}
               onChange={(e) => {
-                const font = FONT_OPTIONS.find(f => f.label === e.target.value);
+                const font = FONT_OPTIONS.find((f) => f.label === e.target.value);
                 if (font) handleConfigChange('font', font);
               }}
               className="w-full px-3 py-2 border rounded-md"
             >
-              {FONT_OPTIONS.map(font => (
+              {FONT_OPTIONS.map((font) => (
                 <option key={font.label} value={font.label}>
                   {font.label}
                 </option>
@@ -85,12 +91,12 @@ export function ConfigPanel({
             <select
               value={config.pageSize.label}
               onChange={(e) => {
-                const size = PAGE_SIZES.find(s => s.label === e.target.value);
+                const size = PAGE_SIZES.find((s) => s.label === e.target.value);
                 if (size) handleConfigChange('pageSize', size);
               }}
               className="w-full px-3 py-2 border rounded-md"
             >
-              {PAGE_SIZES.map(size => (
+              {PAGE_SIZES.map((size) => (
                 <option key={size.label} value={size.label}>
                   {size.label}
                 </option>
@@ -100,14 +106,13 @@ export function ConfigPanel({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Grid Size
+              Grid Size (min: {minGridSize})
             </label>
             <input
               type="number"
-              min={MIN_GRID_SIZE}
-              max={MAX_GRID_SIZE}
+              min={minGridSize}
               value={config.gridSize}
-              onChange={(e) => handleConfigChange('gridSize', Math.max(MIN_GRID_SIZE, Math.min(MAX_GRID_SIZE, parseInt(e.target.value))))}
+              onChange={(e) => handleConfigChange('gridSize', Math.max(minGridSize, parseInt(e.target.value, 10)))}
               className="w-full px-3 py-2 border rounded-md"
             />
           </div>
@@ -121,7 +126,7 @@ export function ConfigPanel({
               min={8}
               max={24}
               value={config.fontSize}
-              onChange={(e) => handleConfigChange('fontSize', parseInt(e.target.value))}
+              onChange={(e) => handleConfigChange('fontSize', parseInt(e.target.value, 10))}
               className="w-full px-3 py-2 border rounded-md"
             />
           </div>
