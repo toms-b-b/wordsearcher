@@ -2,6 +2,8 @@ import React from 'react';
 import { Upload, Download } from 'lucide-react';
 import { PAGE_SIZES, FONT_OPTIONS } from '../utils/constants';
 import { PuzzleConfig } from '../types';
+import { validateGridSize, validateFontSize, validateTitle } from '../utils/validation';
+import { calculateConstraints } from '../utils/constraints';
 
 interface ConfigPanelProps {
   config: PuzzleConfig;
@@ -23,10 +25,30 @@ export function ConfigPanel({
   puzzles,
 }: ConfigPanelProps) {
   const handleConfigChange = (key: string, value: any) => {
-    if (key === 'gridSize' && value < minGridSize) {
-      value = minGridSize;
+    const constraints = calculateConstraints(config.pageSize, config.font);
+    let validatedValue = value;
+    
+    if (key === 'gridSize') {
+      validatedValue = validateGridSize(value, minGridSize, constraints.maxGridSize);
     }
-    setConfig({ ...config, [key]: value });
+    
+    if (key === 'fontSize') {
+      validatedValue = validateFontSize(value, constraints.maxFontSize, 16);
+    }
+    
+    if (key === 'wordBankFontSize') {
+      validatedValue = validateFontSize(value, constraints.maxWordBankFontSize, 14);
+    }
+    
+    if (key === 'titleFontSize') {
+      validatedValue = validateFontSize(value, constraints.maxTitleFontSize, 24);
+    }
+    
+    if (key === 'title') {
+      validatedValue = validateTitle(value);
+    }
+    
+    setConfig({ ...config, [key]: validatedValue });
     regeneratePuzzles();
   };
 
@@ -112,14 +134,14 @@ export function ConfigPanel({
               type="number"
               min={minGridSize}
               value={config.gridSize}
-              onChange={(e) => handleConfigChange('gridSize', Math.max(minGridSize, parseInt(e.target.value, 10)))}
+              onChange={(e) => handleConfigChange('gridSize', parseInt(e.target.value, 10))}
               className="w-full px-3 py-2 border rounded-md"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Font Size
+              Puzzle Font Size
             </label>
             <input
               type="number"
@@ -127,6 +149,20 @@ export function ConfigPanel({
               max={24}
               value={config.fontSize}
               onChange={(e) => handleConfigChange('fontSize', parseInt(e.target.value, 10))}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Word Bank Font Size
+            </label>
+            <input
+              type="number"
+              min={8}
+              max={24}
+              value={config.wordBankFontSize}
+              onChange={(e) => handleConfigChange('wordBankFontSize', parseInt(e.target.value, 10))}
               className="w-full px-3 py-2 border rounded-md"
             />
           </div>

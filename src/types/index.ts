@@ -2,6 +2,7 @@ export interface PuzzleConfig {
   title: string;
   words: string[];
   fontSize: number;
+  wordBankFontSize: number;
   titleFontSize: number;
   pageSize: PageSize;
   directions: Direction[];
@@ -35,4 +36,9 @@ export interface PlacedWord {
   startY: number;
   direction: Direction;
   index: number;
+}
+
+export interface CSVPuzzle {
+  title: string;
+  words: string[];
 }

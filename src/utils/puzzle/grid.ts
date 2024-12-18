@@ -1,8 +1,11 @@
 import { PuzzleCell } from '../../types';
+import { validateGridSize } from '../validation';
 
 export function initializeGrid(size: number): PuzzleCell[][] {
-  return Array(size).fill(null).map((_, y) =>
-    Array(size).fill(null).map((_, x) => ({
+  const validSize = validateGridSize(size);
+  
+  return Array(validSize).fill(null).map((_, y) =>
+    Array(validSize).fill(null).map((_, x) => ({
       letter: '',
       isPartOfWord: false,
       position: { x, y },
