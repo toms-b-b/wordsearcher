@@ -1,4 +1,5 @@
 import { PageSize, FontOption } from '../types';
+import { MAX_GRID_SIZE } from './constants.ts';
 
 interface GridConstraints {
   maxGridSize: number;
@@ -8,9 +9,12 @@ interface GridConstraints {
 }
 
 const FONT_SIZE_FACTORS = {
-  helvetica: 1,
-  times: 0.9,    // Times is slightly more compact
-  courier: 1.2   // Courier takes more space
+  helvetica: 1,      // Standard font size factor
+  times: 0.9,        // Times is slightly more compact
+  courier: 1.2,      // Courier takes more space
+  arial: 1,          // Arial is similar to Helvetica in size
+  georgia: 1.1,      // Georgia is a bit wider and taller than Helvetica
+  verdana: 1.05      // Verdana is slightly more spaced out than Helvetica
 };
 
 export function calculateConstraints(
@@ -37,7 +41,7 @@ export function calculateConstraints(
   const maxTitleFontSize = Math.floor(36 / fontFactor);
 
   return {
-    maxGridSize: Math.min(maxGridSize, 20), // Cap at 20 for practical purposes
+    maxGridSize: Math.min(maxGridSize, MAX_GRID_SIZE), // Cap at 20 for practical purposes
     maxFontSize,
     maxWordBankFontSize,
     maxTitleFontSize

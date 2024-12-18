@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import { PuzzleConfig, PuzzleCell } from '../../types';
 
 export const MARGIN_INCHES = 0.5;
+export const BORDER_RADIUS = 0.1;
 
 export function calculatePDFDimensions(
   doc: jsPDF,
