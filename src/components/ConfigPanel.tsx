@@ -1,7 +1,7 @@
 import React from 'react';
 import { Upload, Download } from 'lucide-react';
-import { PAGE_SIZES, FONT_OPTIONS } from '../utils/constants';
-import { PuzzleConfig } from '../types';
+import { PAGE_SIZES, FONT_OPTIONS, BASE_DIRECTIONS } from '../utils/constants';
+import { PuzzleConfig, Direction } from '../types';
 import { validateGridSize, validateFontSize, validateTitle } from '../utils/validation';
 import { calculateConstraints } from '../utils/constraints';
 
@@ -52,6 +52,21 @@ export function ConfigPanel({
     regeneratePuzzles();
   };
 
+  const handleDirectionChange = (direction: Direction) => {
+    const newDirections = config.directions.includes(direction)
+      ? config.directions.filter(d => d !== direction)
+      : [...config.directions, direction];
+
+    // Ensure at least one direction is selected
+    if (newDirections.length > 0) {
+      handleConfigChange('directions', newDirections);
+    }
+  };
+
+  const toggleBackwards = () => {
+    handleConfigChange('allowBackwards', !config.allowBackwards);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
       <h1 className="text-3xl font-bold mb-6">Word Search Generator</h1>
@@ -82,6 +97,37 @@ export function ConfigPanel({
                 Download All PDFs
               </button>
             )}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Word Directions
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {BASE_DIRECTIONS.map(direction => (
+              <button
+                key={direction}
+                onClick={() => handleDirectionChange(direction)}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors
+                  ${config.directions.includes(direction)
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+              >
+                {direction.charAt(0).toUpperCase() + direction.slice(1)}
+              </button>
+            ))}
+            <button
+              onClick={toggleBackwards}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors
+                ${config.allowBackwards
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+            >
+              Backwards
+            </button>
           </div>
         </div>
 

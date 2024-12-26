@@ -1,4 +1,4 @@
-import { Direction, PuzzleConfig } from '../../types';
+import { Direction } from '../../types';
 
 export function validateDirection(direction: Direction): boolean {
   return ['horizontal', 'vertical', 'diagonal'].includes(direction);
@@ -9,26 +9,50 @@ export function validateWordPlacement(
   gridSize: number,
   direction: Direction,
   x: number,
-  y: number
+  y: number,
+  isBackwards: boolean
 ): boolean {
-  if (x < 0 || y < 0) return false;
-  
+  const wordLength = word.length;
+
+  if (x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
+    return false;
+  }
+
   switch (direction) {
     case 'horizontal':
-      return x + word.length <= gridSize;
+      return isBackwards 
+        ? x - wordLength + 1 >= 0 
+        : x + wordLength <= gridSize;
     case 'vertical':
-      return y + word.length <= gridSize;
+      return isBackwards 
+        ? y - wordLength + 1 >= 0 
+        : y + wordLength <= gridSize;
     case 'diagonal':
-      return x + word.length <= gridSize && y + word.length <= gridSize;
+      return isBackwards 
+        ? (x - wordLength + 1 >= 0 && y - wordLength + 1 >= 0)
+        : (x + wordLength <= gridSize && y + wordLength <= gridSize);
     default:
       return false;
   }
 }
 
-export function validateWord(word: string): boolean {
-  return Boolean(word && typeof word === 'string' && word.trim().length > 0);
-}
-
 export function validatePuzzleWords(words: string[]): string[] {
-  return words.filter(validateWord).map(word => word.trim().toUpperCase());
+  if (!Array.isArray(words)) {
+    return [];
+  }
+
+  return words
+    .map(word => word.trim().toUpperCase())
+    .filter(word => {
+      // Remove empty strings
+      if (!word) return false;
+
+      // Only allow letters
+      if (!/^[A-Z]+$/.test(word)) return false;
+
+      // Ensure reasonable word length (2-15 characters)
+      if (word.length < 2 || word.length > 15) return false;
+
+      return true;
+    });
 }

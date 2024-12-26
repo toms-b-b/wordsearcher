@@ -1,4 +1,4 @@
-import { PageSize, FontOption } from '../types';
+import { PageSize, FontOption, Direction } from '../types';
 
 export const PAGE_SIZES: PageSize[] = [
   { width: 6, height: 9, label: '6" x 9"' },
@@ -14,8 +14,7 @@ export const FONT_OPTIONS: FontOption[] = [
   { label: 'Verdana', value: 'verdana' }
 ];
 
-
-export const DIRECTIONS = ['horizontal', 'vertical', 'diagonal'] as const;
+export const BASE_DIRECTIONS: Direction[] = ['horizontal', 'vertical', 'diagonal'];
 
 export const MIN_GRID_SIZE = 10;
 export const MAX_GRID_SIZE = 25;

@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PuzzleConfig } from '../types';
 import { ConfigPanel } from './ConfigPanel';
 import { PuzzlePreview } from './PuzzlePreview';
+import { PuzzleSelector } from './PuzzleSelector';
 import { useFileUpload } from '../hooks/useFileUpload';
 import { useZipDownload } from '../hooks/useZipDownload';
-import { PAGE_SIZES, FONT_OPTIONS, MIN_GRID_SIZE } from '../utils/constants';
+import { PAGE_SIZES, FONT_OPTIONS, BASE_DIRECTIONS, MIN_GRID_SIZE } from '../utils/constants';
 import { findLongestWordLength } from '../utils/wordUtils';
-import { calculateConstraints } from '../utils/constraints';
-import { validateConfig } from '../utils/validation';
 
 export function PuzzleGenerator() {
   const [puzzles, setPuzzles] = useState<PuzzleConfig[]>([]);
+  const [selectedPuzzle, setSelectedPuzzle] = useState<PuzzleConfig | null>(null);
   const [config, setConfig] = useState<PuzzleConfig>({
     title: '',
     words: [],
@@ -18,7 +18,8 @@ export function PuzzleGenerator() {
     wordBankFontSize: 14,
     titleFontSize: 24,
     pageSize: PAGE_SIZES[0],
-    directions: ['horizontal', 'vertical', 'diagonal'],
+    directions: [...BASE_DIRECTIONS],
+    allowBackwards: false,
     gridSize: MIN_GRID_SIZE,
     font: FONT_OPTIONS[0]
   });
@@ -34,29 +35,11 @@ export function PuzzleGenerator() {
       titleFontSize: config.titleFontSize,
       pageSize: config.pageSize,
       directions: config.directions,
+      allowBackwards: config.allowBackwards,
       gridSize: config.gridSize,
       font: config.font
     })));
   };
-
-  useEffect(() => {
-    if (puzzles.length > 0) {
-      const maxWordLength = Math.max(...puzzles.map(puzzle => 
-        findLongestWordLength(puzzle.words)
-      ));
-      const minGridSize = maxWordLength + 1;
-      const constraints = calculateConstraints(config.pageSize, config.font);
-      
-      setConfig(prev => {
-        const { config: validatedConfig } = validateConfig({
-          ...prev,
-          gridSize: Math.max(prev.gridSize, minGridSize)
-        }, minGridSize);
-        
-        return validatedConfig;
-      });
-    }
-  }, [puzzles, config.pageSize, config.font]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -85,9 +68,15 @@ export function PuzzleGenerator() {
         </div>
       )}
 
-      {puzzles.map((puzzle, index) => (
-        <PuzzlePreview key={index} puzzle={puzzle} />
-      ))}
+      {puzzles.length > 0 && (
+        <PuzzleSelector
+          puzzles={puzzles}
+          selectedPuzzle={selectedPuzzle}
+          onSelect={setSelectedPuzzle}
+        />
+      )}
+
+      {selectedPuzzle && <PuzzlePreview puzzle={selectedPuzzle} />}
     </div>
   );
 }

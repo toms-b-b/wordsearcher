@@ -59,6 +59,7 @@ export function drawSolutionHighlights(
         placedWord.word.length,
         dimensions.cellSize,
         placedWord.direction,
+        placedWord.isBackwards
       );
     });
   } catch (error) {
